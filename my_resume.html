@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mahlangu Glen Thubelihle - Interactive Resume</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Load Inter Font from Google Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        :root {
+            /* INCREASED BOOK WIDTH */
+            --book-width: 900px; 
+            --page-width: calc(var(--book-width) / 2);
+            --page-height: 800px;
+            --book-color: #EDECE8; /* Light off-white for pages */
+            /* CHANGED COVER COLOR TO DEEP NAVY BLUE */
+            --cover-color: #1e3a8a; 
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            perspective: 1500px; /* 3D perspective for the flip effect */
+        }
+
+        /* --- Book Structure --- */
+        #book {
+            width: var(--book-width);
+            height: var(--page-height);
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.8s;
+            /* The 'open' class is kept, but it no longer applies an overall rotation,
+               keeping the book flat on the screen. */
+        }
+
+        /* Initial 3D transformation to open the book (REMOVED TILT) */
+        #book.open {
+            /* transform: rotateY(-30deg); <-- Removed the tilt here */
+        }
+        
+        /* --- Page & Face Styles --- */
+        .page {
+            width: var(--page-width);
+            height: var(--page-height);
+            position: absolute;
+            top: 0;
+            left: 50%; /* Start pages centered, covering the right half */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            transform-origin: left; /* Key for flipping around the spine */
+            transition: transform 0.6s ease-in-out;
+            border-radius: 0 5px 5px 0;
+            background-color: var(--book-color);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            z-index: 10; /* Default z-index */
+            cursor: pointer;
+        }
+
+        /* Left side (Back of flipped pages) */
+        .page-back {
+            left: 0;
+            z-index: 5;
+            border-radius: 5px 0 0 5px;
+            transform: rotateY(180deg) translateZ(1px); /* Keep it flat on the left */
+            transform-origin: right;
+            border-right: none;
+            box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+            background-color: #e5e5e5;
+        }
+        
+        /* The front cover */
+        #page-cover {
+            left: 50%;
+            z-index: 50;
+            background-color: var(--cover-color);
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.5);
+            border-radius: 0 8px 8px 0;
+            cursor: pointer;
+        }
+
+        /* The back cover */
+        #page-back-cover {
+            left: 0;
+            z-index: 4;
+            background-color: var(--cover-color);
+            border-radius: 8px 0 0 8px;
+            transform: rotateY(180deg) translateZ(1px);
+        }
+
+        /* --- Flipping State --- */
+
+        /* Class added by JS when a page is flipped */
+        .flipped {
+            transform: rotateY(-180deg);
+            z-index: 99; /* Bring the flipping page to the front */
+        }
+
+        /* --- Content Layout --- */
+        .page-content {
+            padding: 3rem 2rem;
+            height: 100%;
+            overflow-y: auto;
+            color: #333;
+        }
+
+        /* Styling for the Left Side (previously flipped pages) */
+        .page-back .page-content {
+            transform: scaleX(-1); /* Flip content back so it reads correctly */
+            padding-right: 3rem;
+            padding-left: 2rem;
+            color: #444;
+        }
+
+        /* Custom scrollbar for content overflow */
+        .page-content::-webkit-scrollbar { width: 4px; }
+        .page-content::-webkit-scrollbar-thumb { background: #ccc; border-radius: 2px; }
+
+        /* Cover Title Styling - UPDATED FOR IMAGE */
+        #cover-title {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%; /* Make it take full height */
+            display: flex; /* Use flexbox */
+            flex-direction: column; /* Stack items vertically */
+            justify-content: center; /* Center vertically */
+            align-items: center; /* Center horizontally */
+            text-align: center;
+            color: #fff;
+            font-weight: 700;
+            padding: 2rem; /* Add padding for spacing */
+        }
+
+        /* Style for the profile photo */
+        .profile-photo {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%; /* Make it circular */
+            border: 4px solid #fff; /* White border for contrast */
+            object-fit: cover;
+            margin-bottom: 20px; /* Space below the photo */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <div id="book" class="open">
+
+        <!-- Back Cover (Always on the left) -->
+        <div id="page-back-cover" class="page page-back">
+            <div id="cover-title" class="text-xs">
+                <!-- Content here is intentionally hidden/minimal -->
+            </div>
+        </div>
+        
+        <!-- NEW: Page 10 (The back side of Page 9) -->
+        <div id="page-10" class="page page-back">
+            <div class="page-content">
+                <h3 class="text-sm font-bold text-gray-500 mb-3 text-right">Page 10: Final Contact & Close</h3>
+                <div class="transform scale-x-[-1] text-center">
+                    <h2 class="text-3xl font-bold mb-4 text-gray-700 mt-20">Thank You</h2>
+                    <p class="text-lg text-gray-600 mb-4 px-10">
+                        Thank you for reviewing my interactive resume. I look forward to discussing how my foundational IT skills, self-study drive, and hands-on experience can contribute to your team.
+                    </p>
+                    
+                    <p class="text-xl font-semibold text-indigo-700 mt-12">Contact: 076 263 3541 | kobdrry@gmail.com</p>
+                    
+                    <p class="mt-20 text-gray-600 italic">Click the page to close the book.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- NEW: Page 9 (Front side, flips over Page 10) -->
+        <div id="page-9" class="page z-8" onclick="flipPage('page-9')">
+            <div class="page-content">
+                <h3 class="text-sm font-bold text-gray-500 mb-3">Page 9: Professional Certifications</h3>
+
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Foundational Certifications</h2>
+                <p class="text-gray-600 mb-8 italic">This page showcases key certifications related to IT Support and professional development. Replace the placeholders with your actual certificate images.</p>
+
+                <div class="space-y-8 text-center">
+                    <h4 class="text-xl font-semibold text-indigo-700">Google IT Support Certificate</h4>
+                    <!-- Placeholder for Certificate 1 -->
+                    <img 
+                        src="https://placehold.co/450x300/e0f2f1/0f766e?text=Google+IT+Support+Certificate" 
+                        alt="Google IT Support Certificate Placeholder"
+                        class="mx-auto border rounded-lg shadow-md"
+                    >
+                    <h4 class="text-xl font-semibold text-indigo-700 mt-8">CompTIA A+ (Planned)</h4>
+                    <!-- Placeholder for Certificate 2 -->
+                    <img 
+                        src="https://placehold.co/450x300/fff1f2/be123c?text=CompTIA+A%2B+Study+Plan" 
+                        alt="CompTIA A+ Placeholder"
+                        class="mx-auto border rounded-lg shadow-md"
+                    >
+                </div>
+
+                <p class="mt-12 text-gray-600 italic">Click the page to view the Final Contact Page.</p>
+            </div>
+        </div>
+        
+        <!-- Page 8 (The back side of Page 7) - Matric Certificate -->
+        <div id="page-8" class="page page-back">
+            <div class="page-content">
+                <h3 class="text-sm font-bold text-gray-500 mb-3 text-right">Page 8: Attachment: Matric Certificate</h3>
+                <div class="transform scale-x-[-1] text-center">
+                    <h2 class="text-2xl font-bold mb-4 text-gray-700">Matric Certificate</h2>
+                    <p class="text-gray-600 mb-4 italic">Placeholder for Matric / Grade 12 Certificate image.</p>
+                    <!-- Placeholder: Replace src with actual image URL if provided later -->
+                    <img 
+                        src="https://placehold.co/400x500/e5e5e5/6b7280?text=Matric+Certificate+Image" 
+                        alt="Matric Certificate Placeholder"
+                        class="mx-auto border rounded-lg shadow-md"
+                    >
+                    <!-- UPDATED TEXT TO POINT TO NEW PAGE -->
+                    <p class="mt-12 font-semibold text-indigo-600 italic">Click the page to view the Certificates Page.</p> 
+                </div>
+            </div>
+        </div>
+
+        <!-- Page 7 (Front side, flips over Page 8) - Driver's License -->
+        <div id="page-7" class="page z-15" onclick="flipPage('page-7')">
+            <div class="page-content">
+                <h3 class="text-sm font-bold text-gray-500 mb-3">Page 7: Attachment: Driver's License</h3>
+
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Driver's License</h2>
+                <p class="text-gray-600 mb-8 italic">View the Driver's License document below.</p>
+
+                <div class="space-y-8 text-center">
+                    <!-- Placeholder: Replace src with actual image URL if provided later -->
+                    <img 
+                        src="https://placehold.co/450x300/f0f9ff/374151?text=Driver's+License+Image"
+                        alt="Driver's License Placeholder"
+                        class="mx-auto border rounded-lg shadow-md"
+                    >
+                </div>
+
+                <p class="mt-12 text-gray-600 italic">Click the page to flip to the Matric Certificate.</p>
+            </div>
+        </div>
+
+        <!-- Page 6 (The back side of Page 5) - ID BACK -->
+        <div id="page-6" class="page page-back">
+            <div class="page-content">
+                <h3 class="text-sm font-bold text-gray-500 mb-3 text-right">Page 6: Attachment: ID Document (Back)</h3>
+                <div class="transform scale-x-[-1] text-center">
+                    <h2 class="text-2xl font-bold mb-4 text-gray-700">ID Document (Back)</h2>
+                    <p class="text-gray-600 mb-4 italic">Placeholder for the back side of the South African ID Document.</p>
+                    <!-- Placeholder: Replace src with actual image URL if provided later -->
+                    <img 
+                        src="https://placehold.co/400x500/e5e5e5/6b7280?text=ID+Back+Image" 
+                        alt="ID Back Placeholder"
+                        class="mx-auto border rounded-lg shadow-md"
+                    >
+                    <p class="mt-12 font-semibold text-indigo-600 italic">Click the page to view the Driver's License.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page 5 (Front side, flips over Page 6) - ID FRONT -->
+        <div id="page-5" class="page z-15" onclick="flipPage('page-5')">
+            <div class="page-content">
+                <h3 class="text-sm font-bold text-gray-500 mb-3">Page 5: Attachment: ID Document (Front)</h3>
+
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">South African ID Document (Front)</h2>
+                <p class="text-gray-600 mb-8 italic">View the front side of the ID document below.</p>
+
+                <div class="space-y-8 text-center">
+                    <!-- Placeholder: Replace src with actual image URL if provided later -->
+                    <img 
+                        src="https://placehold.co/450x300/f0f9ff/374151?text=ID+Front+Image" 
+                        alt="ID Front Document Placeholder"
+                        class="mx-auto border rounded-lg shadow-md"
+                    >
+                </div>
+
+                <p class="mt-12 text-gray-600 italic">Click the page to flip to the ID Document (Back).</p>
+            </div>
+        </div>
+
+
+        <!-- Page 4 (The back side of Page 3) -->
+        <div id="page-4" class="page page-back">
+            <div class="page-content">
+                <h3 class="text-sm font-bold text-gray-500 mb-3 text-right">Page 4: Certifications & Education</h3>
+                <div class="transform scale-x-[-1] text-left">
+                    <h2 class="text-2xl font-bold mb-4 text-gray-700">Education</h2>
+                    <ul class="list-none space-y-1 ml-4 text-lg">
+                        <li class="mb-2">
+                            <span class="font-semibold">Matric / Grade 12 (2019)</span><br>
+                            Emakhazeni Boarding School
+                        </li>
+                    </ul>
+
+                    <h2 class="text-2xl font-bold mt-8 mb-4 text-gray-700">Certifications & Professional Development</h2>
+                    <ul class="list-disc list-outside space-y-2 ml-6 text-lg">
+                        <li>**CompTIA A+** (Targeting Q4 2025)</li>
+                        <li>**Udemy: Python Programming for Beginners** (Coursework Completed, 2024)</li>
+                        <li>**Udemy: Linux Command Line Fundamentals** (Coursework Completed, 2024)</li>
+                    </ul>
+                    <p class="mt-12 font-semibold text-indigo-600 italic">Click the page to view Supporting Documents (ID Front).</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page 3 (Front side, flips over Page 4) -->
+        <div id="page-3" class="page z-20" onclick="flipPage('page-3')">
+            <div class="page-content">
+                <h3 class="text-sm font-bold text-gray-500 mb-3">Page 3: Personal Projects</h3>
+
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">Personal Projects</h2>
+                <p class="text-gray-600 mb-6 italic">This section demonstrates the application of new skills (Python, Linux) to solve IT-relevant problems.</p>
+                
+                <div class="space-y-6">
+                    <div>
+                        <h4 class="text-xl font-semibold text-indigo-700">Linux Log Analysis Script (Python/Bash)</h4>
+                        <p class="mt-1 text-lg">Developed a basic Python script, deployed via a Linux/Bash environment, to **scan system log files for specific error patterns**, demonstrating system monitoring and troubleshooting automation concepts.</p>
+                    </div>
+                    <div>
+                        <h4 class="text-xl font-semibold text-indigo-700">Hardware Inventory Tracker (Python)</h4>
+                        <p class="mt-1 text-lg">**Created** a simple command-line application using Python to manage a simulated inventory of PC components, practicing object-oriented programming for IT asset management.</p>
+                    </div>
+                    <div>
+                        <h4 class="text-xl font-semibold text-indigo-700">Technical Portfolio Website (HTML/CSS)</h4>
+                        <p class="mt-1 text-lg">**Designed and coded** a basic professional website using HTML and CSS to serve as an online portfolio, demonstrating an understanding of web infrastructure and front-end principles.</p>
+                    </div>
+                </div>
+
+                <p class="mt-12 text-gray-600 italic">Click the page to flip to Certifications & Education.</p>
+            </div>
+        </div>
+
+        <!-- Page 2 (The back side of the Cover/Page 1) -->
+        <div id="page-2" class="page page-back">
+            <div class="page-content">
+                <h3 class="text-sm font-bold text-gray-500 mb-3 text-right">Page 2: Technical Skills & Experience</h3>
+                
+                <h2 class="text-2xl font-bold mb-4 transform scale-x-[-1] text-right text-gray-700">Technical Skills</h2>
+                <table class="w-full text-lg mt-4 transform scale-x-[-1]">
+                    <tbody class="space-y-1">
+                        <tr class="border-b border-gray-200">
+                            <td class="py-2 font-semibold w-1/4">OS/Systems</td>
+                            <td class="py-2">Windows 11/10, macOS, **Linux Command Line Interface (CLI)**</td>
+                        </tr>
+                        <tr class="border-b border-gray-200">
+                            <td class="py-2 font-semibold">Networking</td>
+                            <td class="py-2">IP configuration, DNS, Routers, Switches, **Wi-Fi setup**</td>
+                        </tr>
+                        <tr class="border-b border-gray-200">
+                            <td class="py-2 font-semibold">Cloud/Admin</td>
+                            <td class="py-2">**Microsoft 365 Admin**, Active Directory, Email setup</td>
+                        </tr>
+                        <tr>
+                            <td class="py-2 font-semibold">Hardware/Scripting</td>
+                            <td class="py-2">Repair/Upgrades, **Foundational Python**, Basic Bash</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <h2 class="text-2xl font-bold mt-8 mb-4 transform scale-x-[-1] text-right text-gray-700">Experience Summary</h2>
+                <div class="mt-4 text-gray-700 transform scale-x-[-1]">
+                    <h3 class="font-semibold text-xl mb-2">Community IT Support (Freelance/Volunteer)</h3>
+                    <p class="text-sm italic mb-4">Self-Employed | [Year Started] – Present</p>
+                    <ul class="list-disc list-outside space-y-2 ml-6 text-lg">
+                        <li>**Repaired and upgraded 10+ computers**, efficiently diagnosing and resolving hardware issues.</li>
+                        <li>**Installed and configured Windows and Linux** operating systems for reliable user experience.</li>
+                        <li>**Assisted community members with Wi-Fi router setup** and troubleshooting internet issues.</li>
+                        <li>**Configured Microsoft 365 and email accounts** for small local businesses.</li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+        
+        <!-- Page 1 (The first page visible when opened) -->
+        <div id="page-1" class="page z-30" onclick="flipPage('page-1')">
+            <div class="page-content">
+                <h3 class="text-sm font-bold text-gray-500 mb-3">Page 1: Profile & Contact</h3>
+
+                <h1 class="text-4xl font-extrabold text-gray-900 mb-2">Mahlangu Glen Thubelihle</h1>
+                <p class="text-lg text-gray-600 mb-6">IT Support Technician</p>
+
+                <div class="bg-gray-50 p-4 rounded-lg mb-8 shadow-sm">
+                    <h2 class="text-xl font-bold text-gray-700 mb-3">Contact Details</h2>
+                    <ul class="space-y-1 text-base">
+                        <li>**Location:** Baadplaas, Mpumalanga</li>
+                        <li>**Phone:** 076 263 3541</li>
+                        <li>**Email:** kobdrry@gmail.com</li>
+                        <li>**GitHub:** <a href="https://github.com/Fineboy94449" target="_blank" class="text-indigo-600 hover:text-indigo-800">Fineboy94449</a></li>
+                    </ul>
+                </div>
+
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">Professional Profile</h2>
+                <p class="text-lg leading-relaxed text-gray-700">
+                    Motivated and results-oriented IT Support Technician with **proven hands-on experience** in hardware repair, operating system deployment, and networking for end-users. Skilled in troubleshooting Windows, macOS, and Linux environments, and providing professional support for essential services like Office 365 and email. Seeking an entry-level Help Desk or IT Support position to leverage foundational scripting knowledge (Python) and strong problem-solving skills to resolve technical issues efficiently.
+                </p>
+
+                <p class="mt-12 text-gray-600 italic">Click the page to flip to Technical Skills & Experience.</p>
+            </div>
+        </div>
+
+        <!-- Front Cover (The outermost page) -->
+        <div id="page-cover" class="page z-40" onclick="flipPage('page-cover')">
+            <div id="cover-title">
+                <!-- Profile Photo Placeholder: Replace the src below with your actual photo URL -->
+                <img 
+                    src="images/4f0531df-defa-4c02-bddb-0912391e4a06.jpg"
+                    alt="Mahlangu Glen Thubelihle Profile Photo Placeholder"
+                    class="profile-photo"
+                    onerror="this.style.display='none';"
+                >
+                <p class="text-xl font-light">The Technical Resume of</p>
+                <h1 class="text-5xl tracking-wide mt-2">Mahlangu Glen Thubelihle</h1>
+                <p class="text-2xl mt-4 italic font-medium">IT Support Specialist</p>
+                <p class="text-xs mt-12 opacity-70">Click to open</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Updated array to include the new attachment pages
+        const pages = ['page-cover', 'page-1', 'page-3', 'page-5', 'page-7', 'page-9']; 
+        let isBookOpen = true; 
+
+        function flipPage(pageId) {
+            const page = document.getElementById(pageId);
+            const book = document.getElementById('book');
+
+            // --- Cover / Close Logic ---
+            if (pageId === 'page-cover' && !page.classList.contains('flipped')) {
+                // Open Cover
+                page.classList.add('flipped');
+                isBookOpen = true;
+
+            } else if (pageId === 'page-cover' && page.classList.contains('flipped')) {
+                // Close Cover / Close Book entirely
+                page.classList.remove('flipped');
+                document.getElementById('page-1').classList.remove('flipped');
+                document.getElementById('page-3').classList.remove('flipped');
+                document.getElementById('page-5').classList.remove('flipped'); // Reset P5
+                document.getElementById('page-7').classList.remove('flipped'); // Reset P7
+                document.getElementById('page-9').classList.remove('flipped'); // NEW: Reset P9
+                
+                setTimeout(() => {
+                    isBookOpen = false;
+                }, 600); 
+            
+            // --- Page 1 Flip Logic (P1 <-> P2) ---
+            } else if (pageId === 'page-1') {
+                page.classList.toggle('flipped');
+            
+            // --- Page 3 Flip Logic (P3 <-> P4) ---
+            } else if (pageId === 'page-3') {
+                if (page.classList.contains('flipped')) {
+                    // Flipping back: P4 -> P3
+                    page.classList.remove('flipped');
+                } else {
+                    // Flipping forward: P3 -> P4
+                    page.classList.add('flipped');
+                }
+
+            // --- Page 5 Flip Logic (P5 <-> P6, ID Front/Back) ---
+            } else if (pageId === 'page-5') {
+                 page.classList.toggle('flipped');
+            
+            // --- Page 7 Flip Logic (P7 <-> P8, License/Matric) ---
+            } else if (pageId === 'page-7') {
+                 page.classList.toggle('flipped');
+                 
+            // --- NEW: Page 9 Flip Logic (P9 <-> P10, Certificates/Close) ---
+            } else if (pageId === 'page-9') {
+                 page.classList.toggle('flipped');
+            }
+
+            // Ensure z-index is maintained correctly on all pages
+            updateZIndex();
+        }
+
+        function updateZIndex() {
+            const cover = document.getElementById('page-cover');
+            const page1 = document.getElementById('page-1');
+            const page3 = document.getElementById('page-3');
+            const page5 = document.getElementById('page-5');
+            const page7 = document.getElementById('page-7'); 
+            const page9 = document.getElementById('page-9'); // Reference new page
+
+            // Default Z-indices.
+            cover.style.zIndex = cover.classList.contains('flipped') ? 15 : 40;
+            page1.style.zIndex = page1.classList.contains('flipped') ? 16 : 30;
+            page3.style.zIndex = page3.classList.contains('flipped') ? 17 : 20;
+            page5.style.zIndex = page5.classList.contains('flipped') ? 18 : 10;
+            page7.style.zIndex = page7.classList.contains('flipped') ? 19 : 9;
+            page9.style.zIndex = page9.classList.contains('flipped') ? 20 : 8; // Lowest content page
+        }
+        
+        // Initial setup for z-index
+        window.onload = updateZIndex;
+
+    </script>
+</body>
+</html>
